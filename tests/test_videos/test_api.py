@@ -271,7 +271,7 @@ class TestVideoPostAPI(TestAPIBase):
 
         vid = Video.objects.get(title=data['title'])
         assert vid.title == data['title']
-        assert vid.slug == u'creating-delicious-apis-for-django-apps-since-201'
+        assert vid.slug == u'creating-delicious-apis-for-django-apps-since-2010'
         assert list(vid.speakers.values_list('name', flat=True)) == ['Guido']
         assert (
             sorted(vid.tags.values_list('tag', flat=True)) ==

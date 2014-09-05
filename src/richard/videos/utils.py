@@ -19,18 +19,18 @@ from django.utils.text import slugify
 
 
 def generate_unique_slug(obj, slug_from, slug_field='slug'):
-    text = getattr(obj, slug_from)[:49]
-    root_text = text
-    for i in range(100):
-        slug = slugify(text_type(text))
-        try:
-            d = {slug_field: slug}
-            obj.__class__.objects.get(**d)
-        except obj.__class__.DoesNotExist:
-            return slug
+    """ generate slug with trailing counts to prevent name collision """
 
-        ending = u'-%s' % i
-        text = root_text + ending
+    max_length = obj._meta.get_field(slug_field).max_length
+
+    text = getattr(obj, slug_from)[:max_length]
+    base_slug = slugify(text_type(text))
+    slug = base_slug
+
+    for i in range(100):
+        if not obj.__class__.objects.filter(**{slug_field: slug}).exists():
+            return slug
+        suffix = text_type(i)
+        slug = u'{}-{}'.format(base_slug[:max_length - len(suffix) - 1], suffix)
 
     raise ValueError('No valid slugs available.')
-
